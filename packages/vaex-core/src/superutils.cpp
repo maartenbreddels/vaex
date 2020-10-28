@@ -154,6 +154,35 @@ std::size_t hash_func(T v) {
     return h(v);
 }
 
+int64_t find_byte(py::buffer buffer, unsigned char needle) {
+    py::buffer_info info = buffer.request();
+    if (info.ndim != 1) {
+        throw std::runtime_error("Expected a 1d byte buffer");
+    }
+    // if(info.format != "O") {
+    //     throw std::runtime_error("Expected an object array");
+    // }
+    py::gil_scoped_release release;
+    unsigned char* begin = (unsigned char*)info.ptr;
+    unsigned char* end = begin + info.shape[0];
+    unsigned char* i = std::find(begin, end, needle);
+    return i == end ? -1 : i - begin;
+}
+
+int64_t count_byte(py::buffer buffer, unsigned char needle) {
+    py::buffer_info info = buffer.request();
+    if (info.ndim != 1) {
+        throw std::runtime_error("Expected a 1d byte buffer");
+    }
+    // if(info.format != "O") {
+    //     throw std::runtime_error("Expected an object array");
+    // }
+    py::gil_scoped_release release;
+    unsigned char* begin = (unsigned char*)info.ptr;
+    unsigned char* end = begin + info.shape[0];
+    return std::count(begin, end, needle);
+}
+
 PYBIND11_MODULE(superutils, m) {
     _import_array();
 
@@ -194,4 +223,6 @@ PYBIND11_MODULE(superutils, m) {
     vaex::init_hash_primitives_prime(m);
     vaex::init_hash_string(m);
     vaex::init_hash_object(m);
+    m.def("find_byte", find_byte);
+    m.def("count_byte", count_byte);
 }

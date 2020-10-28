@@ -488,6 +488,13 @@ def from_json(path_or_buffer, orient=None, precise_float=False, lines=False, cop
                        copy_index=copy_index)
 
 
+def from_csv_arrow(file, chunk_size="10MiB", newline_readahead="64kiB", read_options=None, parse_options=None, convert_options=None):
+    '''Experimental Lazy CSV reader using Apache Arrow'''
+    import vaex.csv
+    ds = vaex.csv.DatasetCsv(file, chunk_size=chunk_size, newline_readahead=newline_readahead, read_options=read_options, parse_options=parse_options, convert_options=convert_options)
+    return vaex.from_dataset(ds)
+
+
 def from_csv(filename_or_buffer, copy_index=False, chunk_size=None, convert=False, fs_options={}, fs=None, **kwargs):
     """
     Read a CSV file as a DataFrame, and optionally convert to an hdf5 file.
